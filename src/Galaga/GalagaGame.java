@@ -17,6 +17,7 @@ public class GalagaGame {
     private final int DEFAULT_ENEMY_SIZE = 24;
     private final int ENEMY_SPACING = 12;
     private final int WINDOW_MARGIN = 20;
+    private final int MAX_TRACTOR_ENEMIES = 2;
 
     private int enemyRows = 6;
     private int enemyCols;
@@ -27,6 +28,7 @@ public class GalagaGame {
     private int lastFighterShot = 0;
 
     private int maximumMovingEnemies = 2;
+
     private int enemyDispatchDelay = 40;
     private int enemyFireDelay =40;
 
@@ -159,6 +161,13 @@ public class GalagaGame {
             int y =tempy;
 
             Point fighterPoint = fighter.getPos();
+
+            // determine whether or not we want to ram the fighter or tractor beam it .
+
+            if (r.nextInt(100) > 75){ // 25% ish
+                System.out.println("TRACTOR!");
+            }
+
             // Send this enemy on a path. Define which it is, where it's going, and override its finish function
             Enemy chosen = enemies[x][y];
             chosen.setPath(new TravelingPath(chosen, new Point(fighterPoint.x, fighterPoint.y+100)){
@@ -457,7 +466,7 @@ public class GalagaGame {
      */
     private Point getSingleClusterOffset(int x, int y){
         return new Point(x * (DEFAULT_ENEMY_SIZE + ENEMY_SPACING) + enemyCorner.x,
-        y * (DEFAULT_ENEMY_SIZE + ENEMY_SPACING) + enemyCorner.y);
+                y * (DEFAULT_ENEMY_SIZE + ENEMY_SPACING) + enemyCorner.y);
     }
 
     /**

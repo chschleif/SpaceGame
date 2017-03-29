@@ -8,7 +8,7 @@ import java.awt.event.KeyListener;
 /**
  * Window element used to display the galaga 'console'
  *
- * @author Christian Schleif
+ * @author chschleif
  * Last modified: 2017 March 24
  */
 class GalagaWindow extends JFrame{

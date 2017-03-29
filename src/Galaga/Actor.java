@@ -5,7 +5,7 @@ import java.awt.*;
 /**
  * The base unit for visible, colliding elements in the Galaga game.
  *
- * @author Christian Schleif
+ * @author chschleif
  * Last modified: 2017 March 24
  */
 public abstract class Actor {

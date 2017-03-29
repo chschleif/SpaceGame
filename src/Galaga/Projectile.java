@@ -5,7 +5,7 @@ import java.awt.*;
 /**
  * A moving actor 'fired' between other actors to collide with them.
  *
- * @author Christian Schleif
+ * @author chschleif
  * Last modified: 2017 March 24
  */
 class Projectile extends Actor{

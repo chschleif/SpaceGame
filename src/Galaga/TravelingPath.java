@@ -6,7 +6,7 @@ import java.util.Random;
 /**
  * A defined path for an actor (an enemy) to follow
  *
- * @author Christian Schleif
+ * @author chschleif
  * Last modified: 2017 March 24
  */
 public abstract class TravelingPath {

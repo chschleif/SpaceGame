@@ -6,7 +6,7 @@ import java.awt.*;
 /**
  * Draw the galaga game -- the middle-man between Game and Window.
  *
- * @author Christian Schleif
+ * @author chschleif
  *         Last modified: 2017 March 24
  */
 class GalagaPanel extends JPanel {

@@ -8,7 +8,7 @@ import java.io.*;
  * Class to represent a high-score "claiming" instance, to set a user's new high score among existing scores
  * (and perhaps display them, too)
  *
- * @author Christian Schleif
+ * @author chschleif
  * Last modified: 2017 March 24
  */
 class HighScore {

@@ -5,7 +5,7 @@ import java.awt.*;
 /**
  * The actor in a game of galaga that opposes the player. Can occasionally follow dive-bombing paths.
  *
- * @author Christian Schleif
+ * @author chschleif
  * Last modified: 2017 March 24
  */
 class Enemy extends Actor{

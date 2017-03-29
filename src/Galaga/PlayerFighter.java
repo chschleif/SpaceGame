@@ -5,7 +5,7 @@ import java.awt.*;
 /**
  * The Actor controlled by the user. Fights. Is green. Can fire weapon.
  *
- * @author Christian Schleif
+ * @author chschleif
  * Last modified: 2017 March 24
  */
 class PlayerFighter extends Actor {

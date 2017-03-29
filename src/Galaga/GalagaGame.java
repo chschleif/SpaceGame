@@ -7,7 +7,7 @@ import java.util.Random;
 /**
  * Game logic related to running a game that's similar and not entirely unlike Galaga. Or galaxa? Or space invaders?
  *
- * @author Christian Schleif
+ * @author chschleif
  * Last modified: 2017 March 24
  */
 public class GalagaGame {

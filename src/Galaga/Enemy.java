@@ -1,5 +1,7 @@
 package Galaga;
 
+import javafx.geometry.Pos;
+
 import java.awt.*;
 
 /**
@@ -76,4 +78,5 @@ class Enemy extends Actor{
             }
         }
     }
+
 }

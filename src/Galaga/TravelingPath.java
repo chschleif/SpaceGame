@@ -24,6 +24,7 @@ public abstract class TravelingPath {
 
         // tie the traveler to the window, pick a random bezier influence
         this.traveler = pathFollower;
+        pathFollower.setPath(this);
         Random r = new Random();
         Dimension window = GalagaGame.getLevelSize();
 
@@ -63,6 +64,10 @@ public abstract class TravelingPath {
     public void updateDestination(Point update){
         p[2] = update;
     }
+
+    public void updateInfluence(Point update) { p[1] = update; }
+
+    public Point getInfluence(){ return p[1]; }
 
     /**
      * Event handler for when the traveler has reached its destination point.

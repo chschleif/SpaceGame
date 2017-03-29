@@ -14,7 +14,7 @@ public class GalagaGame {
 
     private final int DEFAULT_PLAYER_LIVES = 3;
     private final int DEFAULT_PLAYER_DIED_TIMEOUT = 200;
-    private final int DEFAULT_ENEMY_SIZE = 24;
+    public final int DEFAULT_ENEMY_SIZE = 24;
     private final int ENEMY_SPACING = 12;
     private final int WINDOW_MARGIN = 20;
     private final int MAX_TRACTOR_ENEMIES = 2;
@@ -44,6 +44,8 @@ public class GalagaGame {
     private ArrayList<Projectile> shots = new ArrayList<>();
     private final int PROJECTILE_TICK_DISTANCE = 8;
     private int level = 1;
+
+    TractorBeam enemyBeam;
 
     private int score = 0;
 
@@ -140,72 +142,97 @@ public class GalagaGame {
             }
         } else if ((enemyDispatchDelay == 0 || tick % enemyDispatchDelay == 0)
                 && getEnemyPathCount() <= maximumMovingEnemies){
+            sendFighterSwoop();
+        }
 
-            // select an enemy to swoop
-            Random r = new Random();
-            int tempx =r.nextInt(enemyCols);
-            int tempy = r.nextInt(enemyRows);
-            while (!enemies[tempx][tempy].isAlive()){
-                if (getExtreme(Direction.NORTH) == -1){
-                    // new level!
-                    level++;
-                    setLevelParams(level);
-                    return;
-                }
-                tempx =r.nextInt(enemyCols);
-                tempy = r.nextInt(enemyRows);
-            }
-
-            // the anonymous object requires "effectively final" variables, so restate them
-            int x = tempx;
-            int y =tempy;
-
-            Point fighterPoint = fighter.getPos();
-
-            // determine whether or not we want to ram the fighter or tractor beam it .
-
-            if (r.nextInt(100) > 75){ // 25% ish
-                System.out.println("TRACTOR!");
-            }
-
-            // Send this enemy on a path. Define which it is, where it's going, and override its finish function
-            Enemy chosen = enemies[x][y];
-            chosen.setPath(new TravelingPath(chosen, new Point(fighterPoint.x, fighterPoint.y+100)){
-
-                /**
-                 * When the enemy has finished going past the fighter, restart it above the view to swoop back in.
-                 */
-                @Override
-                public void finished() {
-                    // above the view
-                    chosen.setLocation(chosen.getPos().x, -100);
-                    // a new path to swoop back in. when done, clear references to the path.
-                    chosen.setPath(new TravelingPath(chosen, getSingleClusterOffset(x, y)){
-
-                        /**
-                         * When done, clear the references.
-                         */
-                        @Override
-                        public void finished() {
-                            if (chosen.getPath() != null) {
-                                chosen.setPath(null);
-                                score+=5; // five points for surviving a pass-over
-                            }
-                        }
-                        /**
-                         * Allow for potential upper-level logic... and update the destination as the goal keeps moving
-                         */
-                        @Override
-                        public void move(){
-                            super.move();
-                            this.updateDestination(getSingleClusterOffset(x, y));
-                        }
-                    });
-                }
-            });
+        if (enemyBeam != null && tick % 20 == 0){
+            enemyBeam.handleTick();
         }
     }
 
+    private void sendFighterSwoop() {
+
+
+
+        // select an enemy to swoop
+        Random r = new Random();
+        int tempx = r.nextInt(enemyCols);
+        int tempy = r.nextInt(enemyRows);
+
+        if (r.nextInt(100) > 60 && enemyBeam == null) { // 25% ish
+            tempx = r.nextInt(enemyCols);
+            while (!anyAliveInCol(tempx)){
+                tempx = r.nextInt(enemyCols);
+                if (getExtreme(Direction.NORTH) == -1){
+                    setLevelParams(++level);
+                    return;
+                }
+            }
+            for( tempy = 0; tempy < enemyRows; tempy++){
+                if (enemies[tempx][tempy].isAlive()){
+                    break;
+                }
+            }
+            enemyBeam = new TractorBeam(this, fighter.getPos(), enemies[tempx][tempy]);
+            return;
+        } else {
+
+            while (!enemies[tempx][tempy].isAlive()) {
+                if (getExtreme(Direction.NORTH) == -1) {
+                    // new level!
+                    setLevelParams(++level);
+                    return;
+                }
+                tempx = r.nextInt(enemyCols);
+                tempy = r.nextInt(enemyRows);
+            }
+        }
+
+        // the anonymous object requires "effectively final" variables, so restate them
+        int x = tempx;
+        int y = tempy;
+
+        Point fighterPoint = fighter.getPos();
+
+
+        // Send this enemy on a path. Define which it is, where it's going, and override its finish function
+        Enemy chosen = enemies[x][y];
+        chosen.setPath(new TravelingPath(chosen, new Point(fighterPoint.x, fighterPoint.y + 100)) {
+
+            /**
+             * When the enemy has finished going past the fighter, restart it above the view to swoop back in.
+             */
+            @Override
+            public void finished() {
+                // above the view
+                chosen.setLocation(chosen.getPos().x, -100);
+                // a new path to swoop back in. when done, clear references to the path.
+                chosen.setPath(new TravelingPath(chosen, getSingleClusterOffset(x, y)) {
+
+                    /**
+                     * When done, clear the references.
+                     */
+                    @Override
+                    public void finished() {
+                        if (chosen.getPath() != null) {
+                            chosen.setPath(null);
+                            score += 5; // five points for surviving a pass-over
+                        }
+                    }
+
+                    /**
+                     * Allow for potential upper-level logic... and update the destination as the goal keeps moving
+                     */
+                    @Override
+                    public void move() {
+                        super.move();
+                        this.updateDestination(getSingleClusterOffset(x, y));
+                    }
+                });
+            }
+        });
+
+    }
     private void setLevelParams(int level){
 
         TravelingPath.setTravelDistance(1.2 + (0.3)*level);
@@ -270,7 +297,7 @@ public class GalagaGame {
     /**
      * Subtract one life from the count and hide one fighter marker.
      */
-    private void consumeLife(){
+    void consumeLife(){
         // if there's a life left, subtract it and hide a "life marker"
         if (playerLives > 0) {
             playerLives--;
@@ -464,9 +491,20 @@ public class GalagaGame {
      * @param y The row the enemy was in the grid
      * @return The position of where the enemy would be, relative to the upper left swarm corner. (not the level!)
      */
-    private Point getSingleClusterOffset(int x, int y){
+    Point getSingleClusterOffset(int x, int y){
         return new Point(x * (DEFAULT_ENEMY_SIZE + ENEMY_SPACING) + enemyCorner.x,
                 y * (DEFAULT_ENEMY_SIZE + ENEMY_SPACING) + enemyCorner.y);
+    }
+
+    Point getEnemyArrayLocation(Enemy e){
+        for(int x = 0; x < enemies.length; x++){
+            for(int y = 0; y < enemies[x].length; y++){
+                if (enemies[x][y] == e){
+                    return new Point(x, y);
+                }
+            }
+        }
+        return null;
     }
 
     /**

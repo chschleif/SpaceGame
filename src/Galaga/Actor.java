@@ -18,7 +18,7 @@ public abstract class Actor {
     private TravelingPath path = null;
     int[] xVals;
     int[] yVals;
-    private GalagaGame parent;
+    GalagaGame parent;
 
     /**
      * Draw the actor with its custom shape/appearance.
@@ -144,6 +144,9 @@ public abstract class Actor {
             // get the range of projections on the comparison axis for this shape
             for (int i = 0; i < x.length; i++) {
                 PointF intersect = getIntersection(compareAxis, new Line(new PointF(x[i], y[i]), -1 / compareAxis.slope));
+                if (intersect == null){
+                    continue;
+                }
                 if (minYMatch > intersect.y) {
                     minYMatch = intersect.y;
                 }
@@ -156,7 +159,11 @@ public abstract class Actor {
             double thisMinYMatch = Integer.MAX_VALUE;
             double thisMaxYMatch = Integer.MIN_VALUE;
             for (int i = 0; i < xVals.length; i++) {
+
                 PointF intersect = getIntersection(compareAxis, new Line(new PointF(xVals[i], yVals[i]), -1 / compareAxis.slope));
+                if (intersect == null){
+                    continue;
+                }
                 if (thisMinYMatch > intersect.y) {
                     thisMinYMatch = intersect.y;
                 }
@@ -192,6 +199,13 @@ public abstract class Actor {
         // Re-determine the new x/y array representations of the vertices/edges of this shape
         generateRepresentation();
 
+        checkAllCollision();
+    }
+
+    /**
+     * Check for any collisions with this object (as a result of size or location change)
+     */
+     void checkAllCollision(){
         // if relevant, check for collisions. We just move, so see if we're on top of something
         if (this.canCollide && this.isAlive()) {
             for (Actor other : parent.collLibrary) {
@@ -210,8 +224,6 @@ public abstract class Actor {
                 }
             }
         }
-
-
     }
 
     /**
@@ -254,6 +266,8 @@ public abstract class Actor {
         // Regenerate the x/y arrays as we've changed
         // TODO reconsider this
         //generateRepresentation();
+
+        checkAllCollision();
     }
 
     /**

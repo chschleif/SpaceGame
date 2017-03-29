@@ -61,4 +61,9 @@ class PlayerFighter extends Actor {
         this.setSize(new Dimension(size, size));
     }
 
+    public PlayerFighter(GalagaGame parent, PlayerFighter f){
+        super(parent);
+        this.setSize(f.getSize());
+    }
+
 }
